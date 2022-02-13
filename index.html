@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+    </link>
+</head>
+
+<body>
+
+    <canvas id="life"></canvas>
+    x: <div class='pos' id='input_x'></div>
+    y: <div class='pos' id='input_y'></div>
+
+    <div class="contol">
+        <button id="start">Старт</button>
+        <button id="stop">Стоп</button>
+        <button id="reset">Сброс</button>
+    </div>
+    <div class="param">
+        <p>Укажите размер поля:</p>
+        <p>ширина: <input type="number" id="width" placeholder="500" max=1000></p>
+        <p>высота: <input type="number" id="height" placeholder="500"></p>
+    </div>
+    <div class="cell">
+        <p>Укажите размер клетки:</p>
+        <p> <input type="number" id="cell"></p>
+    </div>
+
+
+    
+    <script src="life.js"></script>
+    <script src="index.js"></script>
+</body>
+
+</html>
