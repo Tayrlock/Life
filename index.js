@@ -2,26 +2,32 @@ const btnStart = document.querySelector('#start'),
     btnApply = document.querySelector('#apply'),
     btnStop = document.querySelector('#stop'),
     btnReset = document.querySelector('#reset')
-
-function startLife(play){
-
-
+let play
+createField()
+gameField()
+function startLife(play) {
 }
+
+
 // Start button
 btnStart.addEventListener('click', function startLife() {
-    life();
+    play = true
+    timer()
     // if (play = true) { btnStart.removeEventListener('click', startLife) }
 })
 
 // Apply field size
 btnApply.addEventListener('click', () => {
+    play = false
+    timer()
     createField()
     gameField()
 })
 
 // Stop button
 btnStop.addEventListener('click', () => {
-    clearTimeout(step)
+    play = false
+    timer()
     // play = false
     // btnStart.addEventListener('click', startLife())
 })
@@ -29,7 +35,9 @@ btnStop.addEventListener('click', () => {
 
 // reset button
 btnReset.addEventListener('click', () => {
+    play = false
+    timer()
     createField()
     gameField()
-    clearTimeout(step)
+
 })

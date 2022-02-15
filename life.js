@@ -1,49 +1,87 @@
 const canvas = document.getElementById('life'),
     ctx = canvas.getContext('2d');
-let cell = [],
-    step
 
+let cell = [],
+
+    fieldWidth,
+    fieldHeight,
+    cellSize
+
+function timer() {
+    let step = Math.floor(document.querySelector('#step').value || 5)
+    let a = setTimeout(life, step)
+    if (play == false){ clearTimeout(a)}
+}
+function updateField() {
+    canvas.width = Math.floor(document.querySelector('#width').value || 500)
+    canvas.height = Math.floor(document.querySelector('#height').value || 600)
+    cellSize = Math.floor(document.querySelector('#cell').value || 5)
+    canvas.width = canvas.width - canvas.width % cellSize
+    canvas.height = canvas.height - canvas.height % cellSize
+    sumY = canvas.height / cellSize // 30
+    sumX = canvas.width / cellSize
+    fieldHeight = sumY * cellSize //10*30
+    fieldWidth = sumX * cellSize
+    // console.log('sumY = ' + sumY)
+    // console.log('sumX = ' + sumX)
+    // console.log('cell = ' + cellSize)
+    // console.log('width = ' + fieldWidth)
+    // console.log('height = ' + fieldHeight)
+}
 // Игровое поле формирование
 function createField() {
-    let cellSize = document.querySelector('#cell').value || 10
-    // console.log(cellSize)
-    canvas.width = document.querySelector('#width').value || 300
-    canvas.height = document.querySelector('#height').value || 300
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    updateField()
+    ctx.clearRect(0, 0, fieldWidth, fieldHeight)
 }
 
 // Игровое поле заполнение массивами
-
 function gameField() {
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < sumY; i++) {
         cell[i] = []
-        for (let j = 0; j < 30; j++) {
+        for (let j = 0; j < sumX; j++) {
             cell[i][j] = 0
         }
     }
+    // console.log(cell)
 }
 
 // Получение клеток по координатам
-
-canvas.onclick = function (e) {
+function takeCoord(e) {
     let x = e.offsetX
     let y = e.offsetY
-    console.log(x, y)
-    x = Math.floor(x / 10)
-    y = Math.floor(y / 10)
-    console.log(y, x)
-    cell[y][x] = 1
-    console.log(cell)
+    // console.log(y, x)
+    x = Math.floor(x / cellSize)
+    y = Math.floor(y / cellSize)
+    // console.log(y, x)
+    cell[y][x] = 1;                                         // добавить повторное наведение
+    // if (cell[y][x] == 1) { cell[y][x] = 0 } else { cell[y][x] = 1 }
+    // console.log(cell)
     drawCell()
 }
 
+let mouseIsDown = false;
+canvas.onmousedown = function (e) {
+    mouseIsDown = true;
+    takeCoord(e)
+}
+canvas.onmouseup = function (e) {
+    if (mouseIsDown) takeCoord(e);
+    mouseIsDown = false;
+}
+canvas.onmousemove = function (e) {
+    if (!mouseIsDown) return;
+    takeCoord(e)
+    return false
+}
+
+// Отрисовка
 function drawCell() {
     // console.log(cell)
-    ctx.clearRect(0, 0, 300, 300)
-    for (let i = 0; i < 30; i++) {
-        for (let j = 0; j < 30; j++) {
+    ctx.clearRect(0, 0, fieldWidth, fieldHeight)
+    for (let i = 0; i < sumY; i++) {
+        for (let j = 0; j < sumX; j++) {
             if (cell[i][j] == 1) {
-                ctx.fillRect(j * 10, i * 10, 10, 10)
+                ctx.fillRect(j * cellSize, i * cellSize, cellSize, cellSize)
             }
         }
     }
@@ -52,18 +90,18 @@ function drawCell() {
 function life() {
     let play = true
     let newCell = []
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < sumY; i++) {
         newCell[i] = []
-        for (let j = 0; j < 30; j++) {
+        for (let j = 0; j < sumX; j++) {
             let live = 0
-            if (cell[torEnd(i) + 1][j] == 1) live++ //[1,0] down ↓
-            if (cell[torBgn(i) - 1][j] == 1) live++ //[-1,0] up ↑
-            if (cell[i][torEnd(j) + 1] == 1) live++ //[0,1] right →
-            if (cell[i][torBgn(j) - 1] == 1) live++ //[0,-1]  left ←
-            if (cell[torEnd(i) + 1][torEnd(j) + 1] == 1) live++ //[1,1] ↓→
-            if (cell[torBgn(i) - 1][torEnd(j) + 1] == 1) live++ //[-1,1] ↑→
-            if (cell[torBgn(i) - 1][torBgn(j) - 1] == 1) live++ //[-1,-1] ←↑
-            if (cell[torEnd(i) + 1][torBgn(j) - 1] == 1) live++ //[1,-1] ←↓
+            if (cell[torYEnd(i) + 1][j] == 1) live++ //[1,0] down ↓
+            if (cell[torYBgn(i) - 1][j] == 1) live++ //[-1,0] up ↑
+            if (cell[i][torXEnd(j) + 1] == 1) live++ //[0,1] right →
+            if (cell[i][torXBgn(j) - 1] == 1) live++ //[0,-1]  left ←
+            if (cell[torYEnd(i) + 1][torXEnd(j) + 1] == 1) live++ //[1,1] ↓→
+            if (cell[torYBgn(i) - 1][torXEnd(j) + 1] == 1) live++ //[-1,1] ↑→
+            if (cell[torYBgn(i) - 1][torXBgn(j) - 1] == 1) live++ //[-1,-1] ←↑
+            if (cell[torYEnd(i) + 1][torXBgn(j) - 1] == 1) live++ //[1,-1] ←↓
             if (live == 2) { newCell[i][j] = cell[i][j] } // 2 live = stay, 3 live = born, other = dead
             else {
                 if (live == 3) { newCell[i][j] = 1 }
@@ -74,17 +112,33 @@ function life() {
     // console.log(newCell)
     cell = newCell
     drawCell()
-    step = setTimeout(life, 2)
+    timer()
+}
+function torYBgn(i) {
+    if (i == 0) return (sumY)
+    else return i
+}
+function torYEnd(i) {
+    if (i == sumY - 1) return -1
+    else return i
+}
+function torXBgn(i) {
+    if (i == 0) return (sumX)
+    else return i
+}
+function torXEnd(i) {
+    if (i == sumX - 1) return -1
+    else return i
 }
 
-function torBgn(i) {
-    if (i == 0) return 30
-    else return i
-}
-function torEnd(i) {
-    if (i == 29) return -1
-    else return i
-}
+// function torBgn(i) {
+//     if (i == 0) return 30
+//     else return i
+// }
+// function torEnd(i) {
+//     if (i == 29) return -1
+//     else return i
+// }
 // gameField()
 // var n = y * canvas.width + x;
 // console.log(n)
