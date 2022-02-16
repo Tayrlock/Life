@@ -8,27 +8,42 @@ let cell = [],
     y1,
     x1
 
+// Обработчики событий
+let mouseIsDown = false;
+canvas.onmousedown = function (e) {
+    mouseIsDown = true;
+    takeCoord(e)
+}
+canvas.onmouseup = function (e) {
+    if (mouseIsDown) takeCoord(e);
+    mouseIsDown = false;
+}
+canvas.onmousemove = function (e) {
+    if (!mouseIsDown) return;
+    takeCoord(e)
+    return false
+}
+
+// Скорость шага
 function timer() {
     let step = Math.floor(document.querySelector('#step').value || 5)
     let a = setTimeout(life, step)
     if (play == false) { clearTimeout(a) }
 }
+
+// Получение размеров поля
 function updateField() {
     canvas.width = Math.floor(document.querySelector('#width').value || 500)
     canvas.height = Math.floor(document.querySelector('#height').value || 600)
     cellSize = Math.floor(document.querySelector('#cell').value || 5)
     canvas.width = canvas.width - canvas.width % cellSize
     canvas.height = canvas.height - canvas.height % cellSize
-    sumY = canvas.height / cellSize // 30
+    sumY = canvas.height / cellSize 
     sumX = canvas.width / cellSize
-    fieldHeight = sumY * cellSize //10*30
+    fieldHeight = sumY * cellSize 
     fieldWidth = sumX * cellSize
-    // console.log('sumY = ' + sumY)
-    // console.log('sumX = ' + sumX)
-    // console.log('cell = ' + cellSize)
-    // console.log('width = ' + fieldWidth)
-    // console.log('height = ' + fieldHeight)
 }
+
 // Игровое поле формирование
 function createField() {
     updateField()
@@ -45,6 +60,7 @@ function gameField() {
     }
     // console.log(cell)
 }
+// Рандомное заполнение поля
 function randomCell() {
     for (let i = 0; i < sumY; i++) {
         cell[i] = []
@@ -59,22 +75,18 @@ function randomCell() {
 function takeCoord(e) {
     let x = e.offsetX,
         y = e.offsetY
-    // console.log(y, x)
     x = Math.floor(x / cellSize)
     y = Math.floor(y / cellSize)
-    // console.log(y, x)
     saveCoord(y, x)
-    // console.log(cell)
 }
-// Сохранение координат // добавить повторный клик //неработает как надо
+// Сохранение координат 
 function saveCoord(y, x) {
-    if (x == x1 && y == y1) { return console.log('return bcs stay') }
+    if (x == x1 && y == y1) return
     else {
         if (cell[y][x] == false) {
             cell[y][x] = true;
             x1 = x
             y1 = y
-            console.log(y1, x1)
             addCell(x, y)
         } else {
             cell[y][x] = false
@@ -84,24 +96,6 @@ function saveCoord(y, x) {
         }
     }
 }
-// Обработчики событий
-let mouseIsDown = false;
-canvas.onmousedown = function (e) {
-    mouseIsDown = true;
-    takeCoord(e)
-}
-canvas.onmouseup = function (e) {
-    if (mouseIsDown) takeCoord(e);
-    mouseIsDown = false;
-}
-canvas.onmousemove = function (e) {
-    if (!mouseIsDown) return;
-    takeCoord(e)
-    return false
-}
-// canvas.onclick = function (e) {
-//     takeCoord(e)
-// }
 
 // Отрисовка
 function addCell(x, y) {
@@ -111,7 +105,6 @@ function clearCell(x, y) {
     ctx.clearRect(x * cellSize, y * cellSize, cellSize, cellSize)
 }
 function drawCell() {
-    // console.log(cell)
     ctx.clearRect(0, 0, fieldWidth, fieldHeight)
     for (let i = 0; i < sumY; i++) {
         for (let j = 0; j < sumX; j++) {
@@ -123,8 +116,6 @@ function drawCell() {
 }
 
 function life() {
-    let play = true
-
     // проверка соседних клеток на живые клетки
     let newCell = []
     for (let i = 0; i < sumY; i++) {
@@ -146,11 +137,12 @@ function life() {
             }
         }
     }
-    // console.log(newCell)
     cell = newCell
     drawCell()
     timer()
 }
+
+// Реализация тор для разносторонних прямоугольников
 function torYBgn(i) {
     if (i == 0) return (sumY)
     else return i
@@ -167,7 +159,3 @@ function torXEnd(i) {
     if (i == sumX - 1) return -1
     else return i
 }
-
-// Вы можете получить сплошную черную линию с 1 пикселем, указав линию на полупикселе:
-// context.moveTo(0,5.5);
-// context.lineto(5,5.5);

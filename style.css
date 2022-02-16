@@ -1,8 +1,5 @@
 #life {
   border: solid 1px;
-  /* width: 1000px;
-  height: 1000px; */
-  /* justify-content: center; */
   cursor: crosshair;
 }
 
@@ -11,8 +8,4 @@ p {
 }
 body {
   margin: 10px 0px 0px 10px;
-}
-.pos {
-  display: inline;
-  margin-top: 0px;
 }
