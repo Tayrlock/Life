@@ -6,33 +6,18 @@ const btnStart = document.querySelector('#start'),
 let play
 createField()
 gameField()
-function startLife(play) {
-}
 
-
-// Start button - убрать обработчик canvas после нажатия
+// Start button 
 btnStart.addEventListener('click', function startLife() {
     play = true
     timer()
-    // if (play = true) { btnStart.removeEventListener('click', startLife) }
-})
-
-// Apply field size
-btnApply.addEventListener('click', () => {
-    play = false
-    timer()
-    createField()
-    gameField()
 })
 
 // Stop button
 btnStop.addEventListener('click', () => {
     play = false
     timer()
-    // play = false
-    // btnStart.addEventListener('click', startLife())
 })
-
 
 // reset button
 btnReset.addEventListener('click', () => {
@@ -45,8 +30,15 @@ btnReset.addEventListener('click', () => {
 
 // Random Button
 btnRandom.addEventListener('click', () => {
-    play=false
+    play = false
     timer()
     randomCell()
+})
 
+// Apply field size
+btnApply.addEventListener('click', () => {
+    play = false
+    timer()
+    createField()
+    gameField()
 })
