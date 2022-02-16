@@ -2,15 +2,16 @@ const canvas = document.getElementById('life'),
     ctx = canvas.getContext('2d');
 
 let cell = [],
-
     fieldWidth,
     fieldHeight,
-    cellSize
+    cellSize,
+    y1,
+    x1
 
 function timer() {
     let step = Math.floor(document.querySelector('#step').value || 5)
     let a = setTimeout(life, step)
-    if (play == false){ clearTimeout(a)}
+    if (play == false) { clearTimeout(a) }
 }
 function updateField() {
     canvas.width = Math.floor(document.querySelector('#width').value || 500)
@@ -39,26 +40,51 @@ function gameField() {
     for (let i = 0; i < sumY; i++) {
         cell[i] = []
         for (let j = 0; j < sumX; j++) {
-            cell[i][j] = 0
+            cell[i][j] = false
         }
     }
     // console.log(cell)
 }
+function randomCell() {
+    for (let i = 0; i < sumY; i++) {
+        cell[i] = []
+        for (let j = 0; j < sumX; j++) {
+            (Math.random() > 0.6) ? cell[i][j] = true : cell[i][j] = false
+        }
+    }
+    drawCell()
+}
 
 // Получение клеток по координатам
 function takeCoord(e) {
-    let x = e.offsetX
-    let y = e.offsetY
+    let x = e.offsetX,
+        y = e.offsetY
     // console.log(y, x)
     x = Math.floor(x / cellSize)
     y = Math.floor(y / cellSize)
     // console.log(y, x)
-    cell[y][x] = 1;                                         // добавить повторное наведение
-    // if (cell[y][x] == 1) { cell[y][x] = 0 } else { cell[y][x] = 1 }
+    saveCoord(y, x)
     // console.log(cell)
-    drawCell()
 }
-
+// Сохранение координат // добавить повторный клик //неработает как надо
+function saveCoord(y, x) {
+    if (x == x1 && y == y1) { return console.log('return bcs stay') }
+    else {
+        if (cell[y][x] == false) {
+            cell[y][x] = true;
+            x1 = x
+            y1 = y
+            console.log(y1, x1)
+            addCell(x, y)
+        } else {
+            cell[y][x] = false
+            clearCell(x, y)
+            x1 = x
+            y1 = y
+        }
+    }
+}
+// Обработчики событий
 let mouseIsDown = false;
 canvas.onmousedown = function (e) {
     mouseIsDown = true;
@@ -73,14 +99,23 @@ canvas.onmousemove = function (e) {
     takeCoord(e)
     return false
 }
+// canvas.onclick = function (e) {
+//     takeCoord(e)
+// }
 
 // Отрисовка
+function addCell(x, y) {
+    ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize)
+}
+function clearCell(x, y) {
+    ctx.clearRect(x * cellSize, y * cellSize, cellSize, cellSize)
+}
 function drawCell() {
     // console.log(cell)
     ctx.clearRect(0, 0, fieldWidth, fieldHeight)
     for (let i = 0; i < sumY; i++) {
         for (let j = 0; j < sumX; j++) {
-            if (cell[i][j] == 1) {
+            if (cell[i][j] == true) {
                 ctx.fillRect(j * cellSize, i * cellSize, cellSize, cellSize)
             }
         }
@@ -89,23 +124,25 @@ function drawCell() {
 
 function life() {
     let play = true
+
+    // проверка соседних клеток на живые клетки
     let newCell = []
     for (let i = 0; i < sumY; i++) {
         newCell[i] = []
         for (let j = 0; j < sumX; j++) {
             let live = 0
-            if (cell[torYEnd(i) + 1][j] == 1) live++ //[1,0] down ↓
-            if (cell[torYBgn(i) - 1][j] == 1) live++ //[-1,0] up ↑
-            if (cell[i][torXEnd(j) + 1] == 1) live++ //[0,1] right →
-            if (cell[i][torXBgn(j) - 1] == 1) live++ //[0,-1]  left ←
-            if (cell[torYEnd(i) + 1][torXEnd(j) + 1] == 1) live++ //[1,1] ↓→
-            if (cell[torYBgn(i) - 1][torXEnd(j) + 1] == 1) live++ //[-1,1] ↑→
-            if (cell[torYBgn(i) - 1][torXBgn(j) - 1] == 1) live++ //[-1,-1] ←↑
-            if (cell[torYEnd(i) + 1][torXBgn(j) - 1] == 1) live++ //[1,-1] ←↓
+            if (cell[torYEnd(i) + 1][j] == true) live++ //[1,0] down ↓
+            if (cell[torYBgn(i) - 1][j] == true) live++ //[-1,0] up ↑
+            if (cell[i][torXEnd(j) + 1] == true) live++ //[0,1] right →
+            if (cell[i][torXBgn(j) - 1] == true) live++ //[0,-1]  left ←
+            if (cell[torYEnd(i) + 1][torXEnd(j) + 1] == true) live++ //[1,1] ↓→
+            if (cell[torYBgn(i) - 1][torXEnd(j) + 1] == true) live++ //[-1,1] ↑→
+            if (cell[torYBgn(i) - 1][torXBgn(j) - 1] == true) live++ //[-1,-1] ←↑
+            if (cell[torYEnd(i) + 1][torXBgn(j) - 1] == true) live++ //[1,-1] ←↓
             if (live == 2) { newCell[i][j] = cell[i][j] } // 2 live = stay, 3 live = born, other = dead
             else {
-                if (live == 3) { newCell[i][j] = 1 }
-                else { newCell[i][j] = 0 }
+                if (live == 3) { newCell[i][j] = true }
+                else { newCell[i][j] = false }
             }
         }
     }
@@ -131,67 +168,6 @@ function torXEnd(i) {
     else return i
 }
 
-// function torBgn(i) {
-//     if (i == 0) return 30
-//     else return i
-// }
-// function torEnd(i) {
-//     if (i == 29) return -1
-//     else return i
-// }
-// gameField()
-// var n = y * canvas.width + x;
-// console.log(n)
-
-
-// the data[] array position for pixel [x,y]
-// var n = y * canvas.width + x;
-
-// function writeMessage(canvas, message) {
-//     var context = canvas.getContext('2d');
-//     context.clearRect(0, 0, canvas.width, canvas.height);
-//     context.font = '18pt Calibri';
-//     context.fillStyle = 'black';
-//     context.fillText(message, 10, 25);
-// }
-// function getMousePos(canvas, evt) {
-//     var rect = canvas.getBoundingClientRect();
-//     return {
-//         x: evt.clientX - rect.left,
-//         y: evt.clientY - rect.top
-//     };
-// }
-// var canvas = document.getElementById('myCanvas');
-// var context = canvas.getContext('2d');
-
-// canvas.addEventListener('mousemove', function (evt) {
-//     var mousePos = getMousePos(canvas, evt);
-//     var message = 'Mouse position: ' + mousePos.x + ',' + mousePos.y;
-//     writeMessage(canvas, message);
-// }, false);
-
-// getImageData
-
-// the data[] array position for pixel [x,y]
-// var n = y * canvas.width + x;
-
 // Вы можете получить сплошную черную линию с 1 пикселем, указав линию на полупикселе:
 // context.moveTo(0,5.5);
 // context.lineto(5,5.5);
-
-// координаты
-// function getMousePos(canvas, evt) {
-//     var rect = canvas.getBoundingClientRect();
-//     return {
-//         x: evt.clientX - rect.left,
-//         y: evt.clientY - rect.top
-//     };
-// }
-// canvas.addEventListener('mousemove', function (evt) {
-//     var mousePos = getMousePos(canvas, evt);
-//     let x = document.getElementById('input_x')
-//     let y = document.getElementById('input_y')
-//     x.textContent = mousePos.x
-//     y.textContent = mousePos.y
-// })
-

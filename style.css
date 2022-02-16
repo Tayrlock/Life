@@ -3,11 +3,10 @@
   /* width: 1000px;
   height: 1000px; */
   /* justify-content: center; */
-  cursor:crosshair;
-  
+  cursor: crosshair;
 }
 
-p{
+p {
   margin: 10px 0px 10px 0px;
 }
 body {
